@@ -1,4 +1,4 @@
-import javax.swing.JFrame;
+import javax.swing.*;
 
 /**
  * GamePanel
@@ -12,6 +12,9 @@ public class GameFrame2 extends JFrame {
         this.pack();
         this.setVisible(true);
         this.setLocationRelativeTo(null);
+
+        ImageIcon icon = new ImageIcon("snake.png");
+        this.setIconImage(icon.getImage());
     }
 
 }
