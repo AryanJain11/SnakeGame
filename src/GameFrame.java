@@ -30,7 +30,7 @@ public class GameFrame extends JFrame implements ActionListener {
         // background.setLayout(new FlowLayout());
 
         frame.setLayout(new BorderLayout());
-        frame.setContentPane(new JLabel(new ImageIcon("C:\\Users\\nalwa\\Desktop\\SnakeGame\\bk.png")));
+        frame.setContentPane(new JLabel(new ImageIcon("bk.png")));
         frame.setLayout(new FlowLayout());
         // button
 
