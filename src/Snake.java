@@ -4,7 +4,7 @@ public class Snake {
     // a snake is a collection of points
 
     // initial length of a snake
-    private int length = 1;
+    private int length = 5;
     private int fruitsEaten = 0;
 
     // integer arrays for storing positions(x,y) of each part of a snake
@@ -21,6 +21,10 @@ public class Snake {
     Snake(int a, int b) {
         xPos[0] = a;
         yPos[0] = b;
+        for(int i=1;i<this.length;i++){
+            this.move();
+        }
+        
     }
 
     // move function
@@ -85,12 +89,21 @@ public class Snake {
                 // checks if head of snake is at the same position as some other point of the
                 // snake
                 // generate a better response
-                System.out.println("collided self");
+                
                 this.setLength(i);
+                return false;
+            }
+            //checks head on collision condition and sets length to 0 for each snake
+            else if(snake.xPos[0] == xPos[0] && snake.yPos[0] == yPos[0] && snake!=this){
+                this.setLength(0);
+                System.out.println("collided self");
                 return false;
             }
         }
         return true;
+    }
+    public boolean checkDeath(){
+        return this.length<=2;
     }
 
     // sets length of snake

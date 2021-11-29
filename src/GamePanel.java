@@ -11,8 +11,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
     Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
 //    public static int max_height, max_width, tile_size;
-    public static final int max_height = 600, max_width = 600, tile_size = 25, DELAY = 100;
-    public static int delay = 100;
+    public static final int max_height = 600, max_width = 600, tile_size = 25;
+    public static int delay = 1000;
     int fruitsEaten;
     // currently, unused
     // private static int tileNumber = MAX_HEIGHT * MAX_WIDTH / TILE_SIZE;
@@ -38,7 +38,7 @@ public class GamePanel extends JPanel implements ActionListener {
     // integer to store player number (as two players can currently play the game)
     public int playerNumber;
 
-    GamePanel() {
+    GamePanel(int playerNumberStart) {
 //        max_height = (int)(size.getHeight()/2);
 //        max_width = max_height;
 //        tile_size = (int)(max_height * 0.03125);
@@ -56,7 +56,7 @@ public class GamePanel extends JPanel implements ActionListener {
         random = new Random();
 
         // start a game
-        startGame(1);
+        startGame(playerNumberStart);
 
     }
 
@@ -81,18 +81,21 @@ public class GamePanel extends JPanel implements ActionListener {
 
         // for more than 1 players
         else if (i > 1) {
+            // set player number
+            playerNumber = i;
             // loop through all snakes
             for (int j = 0; j < i; j++) {
                 // generate snake head on random square inside our game surface
                 snakes[j] = new Snake(random.nextInt((int) (max_height / tile_size)) * tile_size,
                         random.nextInt((int) (max_width / tile_size)) * tile_size);
             }
-            // set player number
-            playerNumber = i;
+
+            
             // initialise and start timer
             timer = new Timer(delay, this);
             timer.start();
         }
+
     }
 
     // moves all snakes
@@ -124,13 +127,14 @@ public class GamePanel extends JPanel implements ActionListener {
     // the actual function which puts things on the screen
     public void draw(Graphics g) {
 
-        // the below two for loops make the grid lines
+        
 //        for(int i=0;i<(max_height/tile_size);i++)
 //        {
 //            g.drawLine(i*tile_size,0,i*tile_size,max_height);
 //            g.drawLine(0,i*tile_size,max_width,i*tile_size);
 //        }
         if (running) {
+            // the below two for loops make the grid lines
             for (int i = 0; i < (max_width / tile_size); i++) {
                 g.drawLine(i * tile_size, 0, i * tile_size, max_height);
             }
@@ -162,8 +166,10 @@ public class GamePanel extends JPanel implements ActionListener {
                 g.setFont(new Font("Ink Free",Font.BOLD,40));
                 FontMetrics metrics = getFontMetrics(g.getFont());
 
-                fruitsEaten = snakes[0].getFruitsEaten();
-                g.drawString("Score: "+ fruitsEaten,(max_width-metrics.stringWidth("Score: "+ fruitsEaten))/2,g.getFont().getSize());
+                for(int r=0;r<playerNumber;r++){
+                    fruitsEaten = snakes[r].getFruitsEaten();
+                    g.drawString("Score: "+ fruitsEaten,(max_width-metrics.stringWidth("Score: "+ fruitsEaten))/2,g.getFont().getSize());
+                }
             }
             // food is blue colored
             g.setColor(Color.blue);
@@ -197,10 +203,21 @@ public class GamePanel extends JPanel implements ActionListener {
         {
             this.move();
 
-            // the for loops check if any snakes have self collided
+            //terminates the game if number of players left is 1
+            if(playerNumber<1){
+                this.running=false;
+            }
+
+            // the for loops check if any snakes have self collided if collided then cuts the body of the bit snake to where it was collided (seens as snake eating the other) claso checks if the length of the snake is less than 2 then removes the player from the game.
             for (int i = 0; i < playerNumber; i++) {
                 for (int j = 0; j < playerNumber; j++) {
-                    running = snakes[i].selfCollision(snakes[j]);
+                    snakes[i].selfCollision(snakes[j]);
+                    if(snakes[i].checkDeath()){
+                        for(int m=i;m<playerNumber-1;m++){
+                            snakes[m]=snakes[m+1];
+                        }
+                        playerNumber--;
+                    }
                 }
             }
 
@@ -217,6 +234,7 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     // inner class to handle all keyboard inputs
+    // transfer this class to Snakes class if we make multiplayer over network possible, replace snakes[0] with this. and remove the code for second snake
     public class myKeyAdapter extends KeyAdapter {
 
         // implements keyPressed method from KeyAdapter class
